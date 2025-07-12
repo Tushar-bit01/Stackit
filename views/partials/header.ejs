@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StackIt - Authentication Header</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            padding-top: 70px;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(to right, #0a192f, #1f1b44, #3b0a47);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 40px;
+            position: relative;
+        }
+
+        .search-bar {
+            width: 100%;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 0 20px 0 45px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 20px rgba(234, 165, 62, 0.3);
+        }
+
+        .search-bar::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-bar:focus {
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ask-btn {
+            box-shadow: 0 4px 20px rgba(234, 165, 62, 0.3);
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ask-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .ask-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ask-btn:disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 20px rgba(234, 165, 62, 0.3);
+            filter: none;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        .notification-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .sign-in-btn, .sign-up-btn {
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .sign-in-btn {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .sign-in-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .sign-up-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .sign-up-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .profile-section {
+            position: relative;
+            display: none;
+        }
+
+        .profile-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid transparent;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.1);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 8px 0;
+            min-width: 180px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        .profile-dropdown.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .profile-dropdown-item {
+            padding: 12px 16px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .profile-dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .profile-dropdown-item.logout {
+            color: #ff4757;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 8px;
+        }
+
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d1b69 50%, #3b2d6b 100%);
+            backdrop-filter: blur(10px);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .mobile-menu-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .search-icon-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+
+        .search-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        .guest-notice {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .guest-notice.show {
+            display: block;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 15px;
+            }
+
+            .search-container {
+                flex: 1;
+                max-width: 300px;
+                margin: 0 15px;
+            }
+
+            .nav-actions {
+                gap: 10px;
+            }
+
+            .ask-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .auth-buttons {
+                display: none;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            .mobile-menu .auth-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-container {
+                display: none;
+            }
+
+            .search-icon-btn {
+                display: block;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .ask-btn span {
+                display: none;
+            }
+
+            .ask-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .nav-actions {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">StackIt</a>
+            
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-bar" placeholder="Search questions, answers, or topics...">
+            </div>
+
+            <div class="nav-actions">
+                <button class="search-icon-btn">🔍</button>
+                
+                <a href="/questions" class="ask-btn" id="askBtn">
+                    <span>+</span>
+                    Ask Question
+                </a>
+                
+                <button class="notification-btn" id="notificationBtn">
+                    🔔
+                    <span class="notification-badge">3</span>
+                </button>
+
+                <!-- Guest State: Show Sign In/Sign Up buttons -->
+                <div class="auth-buttons" id="authButtons">
+                    <a href="#" class="sign-in-btn" onclick="loginUser()">Sign In</a>
+                    <a href="#" class="sign-up-btn" onclick="loginUser()">Sign Up</a>
+                </div>
+
+                <!-- Authenticated State: Show Profile -->
+                <div class="profile-section" id="profileSection">
+                    <div class="profile-avatar" onclick="toggleProfileDropdown()">U</div>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <a href="#" class="profile-dropdown-item">👤 Profile</a>
+                        <a href="#" class="profile-dropdown-item">⚙ Settings</a>
+                        <a href="#" class="profile-dropdown-item">📊 My Questions</a>
+                        <a href="#" class="profile-dropdown-item">💬 My Answers</a>
+                        <button class="profile-dropdown-item logout" onclick="logoutUser()">🚪 Logout</button>
+                    </div>
+                </div>
+
+                <button class="mobile-toggle" onclick="toggleMobileMenu()">☰</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+            <div class="auth-buttons" id="mobileAuthButtons">
+                <a href="#" class="sign-in-btn" onclick="loginUser()">Sign In</a>
+                <a href="#" class="sign-up-btn" onclick="loginUser()">Sign Up</a>
+            </div>
+            <div class="profile-section" id="mobileProfileSection" style="display: none;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="#" class="profile-dropdown-item">👤 Profile</a>
+                    <a href="#" class="profile-dropdown-item">⚙ Settings</a>
+                    <a href="#" class="profile-dropdown-item">📊 My Questions</a>
+                    <a href="#" class="profile-dropdown-item">💬 My Answers</a>
+                    <button class="profile-dropdown-item logout" onclick="logoutUser()">🚪 Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guest Notice -->
+    <div class="guest-notice" id="guestNotice">
+        <strong>⚠ Guest Mode:</strong> Sign in to ask questions, post answers, and unlock all features!
+    </div>
+
+    <script>
+        // Authentication state
+        let isAuthenticated = false;
+        let currentUser = null;
+
+        // Initialize the page
+        function initializePage() {
+            // Check if user is authenticated (using variables instead of localStorage)
+            if (isAuthenticated) {
+                setAuthenticatedMode();
+            } else {
+                setGuestMode();
+            }
+        }
+
+        // Set guest mode
+        function setGuestMode() {
+            isAuthenticated = false;
+            currentUser = null;
+            
+            // Show auth buttons, hide profile
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('profileSection').style.display = 'none';
+            document.getElementById('mobileAuthButtons').style.display = 'flex';
+            document.getElementById('mobileProfileSection').style.display = 'none';
+            
+            // Disable actions for guests
+            document.getElementById('askBtn').style.pointerEvents = 'none';
+            document.getElementById('notificationBtn').disabled = true;
+            document.getElementById('askBtn').title = 'Sign in to ask questions';
+            document.getElementById('notificationBtn').title = 'Sign in to view notifications';
+            
+            // Show guest notice
+            document.getElementById('guestNotice').classList.add('show');
+        }
+
+        // Set authenticated mode
+        function setAuthenticatedMode() {
+            isAuthenticated = true;
+            currentUser = { name: 'User', email: 'user@example.com' };
+            
+            // Hide auth buttons, show profile
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('profileSection').style.display = 'block';
+            document.getElementById('mobileAuthButtons').style.display = 'none';
+            document.getElementById('mobileProfileSection').style.display = 'block';
+            
+            // Enable actions for authenticated users
+            document.getElementById('askBtn').style.pointerEvents = 'auto';
+            document.getElementById('notificationBtn').disabled = false;
+            document.getElementById('askBtn').title = '';
+            document.getElementById('notificationBtn').title = '';
+            
+            // Hide guest notice
+            document.getElementById('guestNotice').classList.remove('show');
+        }
+
+        // Login user (simulate)
+        function loginUser() {
+            setAuthenticatedMode();
+            alert('Welcome! You are now signed in.');
+        }
+
+        // Logout user
+        function logoutUser() {
+            setGuestMode();
+            toggleProfileDropdown(); // Close dropdown
+            alert('You have been signed out.');
+        }
+
+        // Toggle profile dropdown
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const profileSection = document.getElementById('profileSection');
+            const dropdown = document.getElementById('profileDropdown');
+            
+            if (!profileSection.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileToggle = document.querySelector('.mobile-toggle');
+            
+            if (!mobileMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Handle ask question button click
+        document.getElementById('askBtn').addEventListener('click', function(e) {
+            if (!isAuthenticated) {
+                e.preventDefault(); // Only prevent default if not authenticated
+                alert('⚠ Please sign in to ask a question!');
+                return;
+            }
+            // If authenticated, let the link work normally
+            // The browser will navigate to /questions/create
+        });
+
+        // Handle notification button click
+        document.getElementById('notificationBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!isAuthenticated) {
+                alert('⚠ Please sign in to view notifications!');
+                return;
+            }
+            alert('✅ Opening notifications...');
+        });
+
+        // Initialize the page when loaded
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

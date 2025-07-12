@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack It - Signup page</title>
+    <link rel="stylesheet" href="/css/auth/register.css">
+</head>
+<body>
+   <div class="signup-container">
+        <div class="logo">
+            <h1>StackIt</h1>
+        </div>
+
+        <div class="signup-header">
+            <h2>SIGN UP TO STACKIT</h2>
+        </div>
+
+        <div class="fun-fact" id="funFact">
+            <p>💡 Fun Fact: Loading amazing fact...</p>
+        </div>
+
+        <form id="signupForm" action="/auth/register" method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Enter your email" 
+                    required>
+            </div>
+        
+            <div class="form-group">
+                <label for="username">New Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Enter your username" 
+                    required>
+            </div>
+        
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter a password" 
+                    required>
+            </div>
+        
+            <div class="signup-buttons">
+                <button type="submit" class="signup-btn email-btn" id="emailBtn">
+                    Sign Up
+                </button>
+            </div>
+        </form>
+        
+
+        <!-- <div class="additional-links">
+            <a href="#">Forgot your password?</a> | <a href="#">Create an account</a>
+        </div> -->
+    </div>
+ 
+    <script src="/js/auth/register.js"></script>
+</body>
+</html>

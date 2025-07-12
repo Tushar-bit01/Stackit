@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack It - Question</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to right, #0a192f, #1f1b44, #3b0a47);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 80px rgba(83, 52, 131, 0.2);
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .rich-editor {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .rich-editor:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .editor-toolbar {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .editor-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .editor-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .editor-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .editor-content {
+            min-height: 150px;
+            padding: 15px;
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.5;
+            outline: none;
+            overflow-y: auto;
+        }
+
+        .editor-content[contenteditable]:empty:before {
+            content: "Describe your question in detail...";
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            min-height: 48px;
+            align-items: center;
+            cursor: text;
+            transition: all 0.3s ease;
+        }
+
+        .tags-container:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag-remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 0;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .tag-remove:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tag-input {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1rem;
+            outline: none;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .tag-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tag-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .tag-suggestion {
+            padding: 10px 15px;
+            cursor: pointer;
+            color: #ffffff;
+            transition: background 0.2s ease;
+        }
+
+        .tag-suggestion:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tags-input-group {
+            position: relative;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .emoji-picker {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+        }
+
+        .emoji-btn {
+            padding: 5px;
+            border: none;
+            background: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .emoji-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .editor-toolbar {
+                flex-wrap: wrap;
+                gap: 3px;
+            }
+
+            .editor-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ask your Question</h1>
+            <p>Share your doubt and get help from the community</p>
+        </div>
+
+        <% if (typeof error !== 'undefined') { %>
+        <div class="error-message">
+            <%= error %>
+        </div>
+        <% } %>
+
+        <form id="questionForm" action="/questions" method="POST">
+            <div class="form-group">
+                <label class="form-label" for="title">Title *</label>
+                <input type="text" id="title" name="title" class="form-input" 
+                       placeholder="Write a short, descriptive title..." required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description *</label>
+                <div class="rich-editor">
+                    <div class="editor-toolbar">
+                        <button type="button" class="editor-btn" data-command="bold">
+                            <strong>B</strong>
+                        </button>
+                        <button type="button" class="editor-btn" data-command="italic">
+                            <em>I</em>
+                        </button>
+                        <button type="button" class="editor-btn" data-command="strikethrough">
+                            <s>S</s>
+                        </button>
+                        <button type="button" class="editor-btn" data-command="insertOrderedList">
+                            1. List
+                        </button>
+                        <button type="button" class="editor-btn" data-command="insertUnorderedList">
+                            • List
+                        </button>
+                        <button type="button" class="editor-btn" data-command="justifyLeft">
+                            ☰
+                        </button>
+                        <button type="button" class="editor-btn" data-command="justifyCenter">
+                            ☷
+                        </button>
+                        <button type="button" class="editor-btn" data-command="justifyRight">
+                            ☱
+                        </button>
+                        <button type="button" class="editor-btn" id="linkBtn">
+                            🔗
+                        </button>
+                        <button type="button" class="editor-btn" id="imageBtn">
+                            🖼️
+                        </button>
+                        <button type="button" class="editor-btn" id="emojiBtn">
+                            😊
+                        </button>
+                    </div>
+                    <div class="editor-content" contenteditable="true" id="description"></div>
+                    <div class="emoji-picker" id="emojiPicker">
+                        <div class="emoji-grid" id="emojiGrid"></div>
+                    </div>
+                </div>
+                <input type="file" class="file-input" id="imageInput" accept="image/*">
+                <input type="hidden" name="description" id="descriptionInput">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tags *</label>
+                <div class="tags-input-group">
+                    <div class="tags-container" id="tagsContainer">
+                        <input type="text" class="tag-input" id="tagInput"
+                               placeholder="Add tags (e.g., React, JWT, Node.js)...">
+                    </div>
+                    <div class="tag-suggestions" id="tagSuggestions"></div>
+                </div>
+                <input type="hidden" name="tags" id="tagsInput">
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Post Question
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Rich Text Editor
+        const editorBtns = document.querySelectorAll('.editor-btn');
+        const editorContent = document.getElementById('description');
+        const descriptionInput = document.getElementById('descriptionInput');
+        const tagsInput = document.getElementById('tagsInput');
+        const linkBtn = document.getElementById('linkBtn');
+        const imageBtn = document.getElementById('imageBtn');
+        const imageInput = document.getElementById('imageInput');
+        const emojiBtn = document.getElementById('emojiBtn');
+        const emojiPicker = document.getElementById('emojiPicker');
+        const emojiGrid = document.getElementById('emojiGrid');
+        
+        // Editor commands
+        editorBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const command = btn.dataset.command;
+                if (command) {
+                    document.execCommand(command, false, null);
+                    editorContent.focus();
+                    updateToolbarState();
+                }
+            });
+        });
+        
+        // Update toolbar state
+        function updateToolbarState() {
+            editorBtns.forEach(btn => {
+                const command = btn.dataset.command;
+                if (command && document.queryCommandState(command)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        
+        editorContent.addEventListener('keyup', updateToolbarState);
+        editorContent.addEventListener('mouseup', updateToolbarState);
+        
+        // Link insertion
+        linkBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = prompt('Enter URL:');
+            if (url) {
+                document.execCommand('createLink', false, url);
+                editorContent.focus();
+            }
+        });
+        
+        // Image upload
+        imageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            imageInput.click();
+        });
+        
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = `<img src="${e.target.result}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0;">`;
+                    document.execCommand('insertHTML', false, img);
+                    editorContent.focus();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Emoji picker
+        const emojis = ['😊', '😂', '😍', '🤔', '👍', '👎', '❤️', '🔥', '💯', '🚀', '⭐', '✨', '🎉', '💡', '🤝', '👏', '🙏', '💪', '🏆', '🎯', '🔧', '💻', '📱', '🌟', '🚀', '⚡', '🔥', '💎', '🎨', '🎵', '📚', '🏅'];
+        
+        emojis.forEach(emoji => {
+            const btn = document.createElement('button');
+            btn.className = 'emoji-btn';
+            btn.textContent = emoji;
+            btn.type = 'button';
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.execCommand('insertHTML', false, emoji);
+                emojiPicker.style.display = 'none';
+                editorContent.focus();
+            });
+            emojiGrid.appendChild(btn);
+        });
+        
+        emojiBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            emojiPicker.style.display = emojiPicker.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        // Close emoji picker when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!emojiBtn.contains(e.target) && !emojiPicker.contains(e.target)) {
+                emojiPicker.style.display = 'none';
+            }
+        });
+        
+        // Tags functionality
+        const tagsContainer = document.getElementById('tagsContainer');
+        const tagInput = document.getElementById('tagInput');
+        const tagSuggestions = document.getElementById('tagSuggestions');
+        const tags = [];
+        
+        const popularTags = ['React', 'JavaScript', 'Node.js', 'Python', 'Java', 'HTML', 'CSS', 'MongoDB', 'Express', 'Vue.js', 'Angular', 'TypeScript', 'PHP', 'SQL', 'Docker', 'AWS', 'Git', 'Redux', 'Next.js', 'Flutter', 'Django', 'Laravel', 'Spring Boot', 'GraphQL', 'REST API', 'JWT', 'OAuth', 'Firebase', 'PostgreSQL', 'MySQL'];
+        
+        function createTag(text) {
+            const tag = document.createElement('div');
+            tag.className = 'tag';
+            tag.innerHTML = `
+                ${text}
+                <button type="button" class="tag-remove" onclick="removeTag(this)">×</button>
+            `;
+            return tag;
+        }
+        
+        function removeTag(button) {
+            const tag = button.parentElement;
+            const tagText = tag.textContent.replace('×', '').trim();
+            const index = tags.indexOf(tagText);
+            if (index > -1) {
+                tags.splice(index, 1);
+            }
+            tag.remove();
+            updateTagsInput();
+        }
+        
+        function addTag(text) {
+            const trimmedText = text.trim();
+            if (trimmedText && !tags.includes(trimmedText)) {
+                tags.push(trimmedText);
+                const tagElement = createTag(trimmedText);
+                tagsContainer.insertBefore(tagElement, tagInput);
+                tagInput.value = '';
+                hideSuggestions();
+                updateTagsInput();
+            }
+        }
+        
+        function updateTagsInput() {
+            tagsInput.value = tags.join(',');
+        }
+        
+        function showSuggestions(query) {
+            const filtered = popularTags.filter(tag =>
+                tag.toLowerCase().includes(query.toLowerCase()) && !tags.includes(tag)
+            );
+        
+            if (filtered.length > 0) {
+                tagSuggestions.innerHTML = filtered.map(tag =>
+                    `<div class="tag-suggestion" onclick="addTag('${tag}')">${tag}</div>`
+                ).join('');
+                tagSuggestions.style.display = 'block';
+            } else {
+                hideSuggestions();
+            }
+        }
+        
+        function hideSuggestions() {
+            tagSuggestions.style.display = 'none';
+        }
+        
+        tagInput.addEventListener('input', (e) => {
+            const query = e.target.value;
+            if (query.length > 0) {
+                showSuggestions(query);
+            } else {
+                hideSuggestions();
+            }
+        });
+        
+        tagInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                addTag(tagInput.value);
+            } else if (e.key === 'Backspace' && tagInput.value === '' && tags.length > 0) {
+                removeTag(tagsContainer.children[tagsContainer.children.length - 2].querySelector('.tag-remove'));
+            }
+        });
+        
+        // Form submission
+        document.getElementById('questionForm').addEventListener('submit', (e) => {
+            const title = document.getElementById('title').value.trim();
+            const description = editorContent.innerHTML.trim();
+        
+            if (!title) {
+                e.preventDefault();
+                alert('Please enter a title');
+                return;
+            }
+        
+            if (!description || description === '') {
+                e.preventDefault();
+                alert('Please enter a description');
+                return;
+            }
+        
+            if (tags.length === 0) {
+                e.preventDefault();
+                alert('Please add at least one tag');
+                return;
+            }
+        
+            // Update hidden inputs with current values
+            descriptionInput.value = description;
+            updateTagsInput();
+        
+            // Show loading state
+            const submitBtn = document.querySelector('.submit-btn');
+            submitBtn.textContent = 'Posting...';
+            submitBtn.disabled = true;
+        });
+        
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!tagInput.contains(e.target) && !tagSuggestions.contains(e.target)) {
+                hideSuggestions();
+            }
+        });
+    </script>
+</body>
+
+</html>

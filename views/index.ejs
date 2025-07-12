@@ -1,23 +1,553 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>StackIt - Home</title>
-  <link rel="stylesheet" href="/styles.css"> <!-- optional CSS -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StackIt - Homepage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #0a192f, #1f1b44, #3b0a47);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+           background: linear-gradient(to left, #0a192f, #1f1b44, #3b0a47);
+            border-right: 1px solid #444;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar.mobile-hidden {
+            transform: translateX(-100%);
+        }
+
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #444;
+        }
+
+        .logo h1 {
+            color: #8b5cf6;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            color: #d1d5db;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+        }
+
+        .menu-item.active {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            border-right: 3px solid #8b5cf6;
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            fill: currentColor;
+        }
+
+        .topics-submenu {
+            background: rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            max-height: 0;
+        }
+
+        .topics-submenu.open {
+            max-height: 300px;
+        }
+
+        .submenu-item {
+            padding: 12px 20px 12px 52px;
+            color: #a1a1aa;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .submenu-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+        }
+
+        .chevron {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .chevron.open {
+            transform: rotate(180deg);
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1100;
+            background: rgba(139, 92, 246, 0.2);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-toggle:hover {
+            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .hamburger {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 20px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.full-width {
+            margin-left: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #8b5cf6;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #d1d5db;
+            font-size: 18px;
+        }
+
+        /* Questions Feed */
+        .questions-feed {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .question-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 14px;
+            color: #a1a1aa;
+        }
+
+        .question-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .question-preview {
+            color: #d1d5db;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .question-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .vote-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vote-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #d1d5db;
+        }
+
+        .vote-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+        }
+
+        .vote-btn.upvoted {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .vote-btn.downvoted {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .vote-count {
+            font-weight: 600;
+            min-width: 20px;
+        }
+
+        .tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 80px 20px 20px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .question-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .question-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+
+        /* Overlay for mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+    </style>
+     <script>
+        var serverData = <%- JSON.stringify({ 
+            isAuthenticated: !!user, 
+            user: user || null 
+        }) %>;
+    </script>
+  <script src="/js/auth_handler.js"></script>
 </head>
 <body>
- 
+    <%- include('partials/header') %>
+    <!-- Mobile Toggle Button -->
+    <button class="mobile-toggle" onclick="toggleMobileMenu()">
+        <svg class="hamburger" viewBox="0 0 24 24">
+            <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </button>
 
-  <div style="text-align:center; margin-top: 50px;">
-    <h1>Welcome to <span style="color: #007bff;">StackIt</span> 💬</h1>
-    <p>A simple Q&A platform built for collaborative learning.</p>
-    
-    <div style="margin-top: 30px;">
-      <a href="/questions" style="margin-right: 15px;">🧠 View Questions</a>
-      <a href="/questions/ask">➕ Ask a Question</a>
-    </div>
-  </div>
+    <!-- Overlay for mobile -->
+    <div class="overlay" onclick="closeMobileMenu()"></div>
 
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="logo">
+            <h1>StackIt</h1>
+        </div>
+        
+        <a href="#" class="menu-item active">
+            <svg class="menu-icon" viewBox="0 0 24 24">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9,22 9,12 15,12 15,22"/>
+            </svg>
+            Home
+        </a>
+        
+        <div class="menu-item" onclick="toggleTopics()">
+            <svg class="menu-icon" viewBox="0 0 24 24">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+            Topics
+            <svg class="chevron" viewBox="0 0 24 24" width="16" height="16">
+                <polyline points="6,9 12,15 18,9" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+        </div>
+        
+        <div class="topics-submenu" id="topicsSubmenu">
+            <a href="#" class="submenu-item">Technology</a>
+            <a href="#" class="submenu-item">Games</a>
+            <a href="#" class="submenu-item">Science</a>
+            <a href="#" class="submenu-item">Education</a>
+            <a href="#" class="submenu-item">Art</a>
+        </div>
+        
+        <a href="#" class="menu-item">
+            <svg class="menu-icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            About Us
+        </a>
+    </nav>
 
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="header">
+            <h1>Welcome to StackIt</h1>
+            <p>Share knowledge, ask questions, and build community</p>
+        </div>
+
+        <div class="questions-feed">
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-meta">
+                        <span>Posted by @techguru • 2 hours ago</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">Technology</span>
+                        <span class="tag">JavaScript</span>
+                    </div>
+                </div>
+                <h3 class="question-title">How to optimize React performance for large datasets?</h3>
+                <p class="question-preview">I'm working on a React application that needs to display thousands of items in a list. What are the best practices for handling large datasets without compromising performance?</p>
+                <div class="question-actions">
+                    <div class="vote-buttons">
+                        <button class="vote-btn" onclick="vote(this, 'up')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 4l8 8H4l8-8z"/>
+                            </svg>
+                            <span class="vote-count">24</span>
+                        </button>
+                        <button class="vote-btn" onclick="vote(this, 'down')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 20l-8-8h16l-8 8z"/>
+                            </svg>
+                            <span class="vote-count">2</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-meta">
+                        <span>Posted by @gamedev • 4 hours ago</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">Games</span>
+                        <span class="tag">Unity</span>
+                    </div>
+                </div>
+                <h3 class="question-title">Best practices for 2D lighting in Unity?</h3>
+                <p class="question-preview">I'm creating a 2D platformer and want to add dynamic lighting effects. What are the most efficient ways to implement this in Unity without affecting performance?</p>
+                <div class="question-actions">
+                    <div class="vote-buttons">
+                        <button class="vote-btn" onclick="vote(this, 'up')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 4l8 8H4l8-8z"/>
+                            </svg>
+                            <span class="vote-count">15</span>
+                        </button>
+                        <button class="vote-btn" onclick="vote(this, 'down')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 20l-8-8h16l-8 8z"/>
+                            </svg>
+                            <span class="vote-count">1</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-header">
+                    <div class="question-meta">
+                        <span>Posted by @scientist • 6 hours ago</span>
+                    </div>
+                    <div class="tags">
+                        <span class="tag">Science</span>
+                        <span class="tag">Physics</span>
+                    </div>
+                </div>
+                <h3 class="question-title">Understanding quantum entanglement in simple terms</h3>
+                <p class="question-preview">I'm trying to understand quantum entanglement for a presentation. Can someone explain it in terms that a non-physicist audience would understand?</p>
+                <div class="question-actions">
+                    <div class="vote-buttons">
+                        <button class="vote-btn" onclick="vote(this, 'up')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 4l8 8H4l8-8z"/>
+                            </svg>
+                            <span class="vote-count">42</span>
+                        </button>
+                        <button class="vote-btn" onclick="vote(this, 'down')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 20l-8-8h16l-8 8z"/>
+                            </svg>
+                            <span class="vote-count">3</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script >function toggleTopics() {
+        const submenu = document.getElementById('topicsSubmenu');
+        const chevron = document.querySelector('.chevron');
+        
+        submenu.classList.toggle('open');
+        chevron.classList.toggle('open');
+    }
+
+    function toggleMobileMenu() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.overlay');
+        
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('active');
+    }
+
+    function closeMobileMenu() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.overlay');
+        
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+    }
+
+    function vote(button, type) {
+        const voteButtons = button.parentElement.querySelectorAll('.vote-btn');
+        
+        // Remove existing vote states
+        voteButtons.forEach(btn => {
+            btn.classList.remove('upvoted', 'downvoted');
+        });
+        
+        // Add new vote state
+        if (type === 'up') {
+            button.classList.add('upvoted');
+        } else {
+            button.classList.add('downvoted');
+        }
+    }
+
+    // Close mobile menu when clicking on menu items
+    document.querySelectorAll('.menu-item, .submenu-item').forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                closeMobileMenu();
+            }
+        });
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeMobileMenu();
+        }
+    });</script>
 </body>
 </html>

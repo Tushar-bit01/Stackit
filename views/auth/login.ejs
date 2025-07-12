@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack It - Sign In Page</title>
+    <link rel="stylesheet" href="/css/auth/login.css">
+</head>
+<body>
+      <div class="signin-container">
+        <div class="logo">
+            <h1>StackIt</h1>
+        </div>
+
+        <div class="signin-header">
+            <h2>Sign In to StackIt</h2>
+        </div>
+
+        <div class="fun-fact" id="funFact">
+            <p>💡 Fun Fact: Loading amazing fact...</p>
+        </div>
+
+        <form id="signinForm" action="/auth/login" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Enter your username" 
+                    required>
+            </div>
+        
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter your password" 
+                    required>
+            </div>
+        
+            <button type="submit" class="signin-btn">Sign In</button>
+        </form>
+        
+        <!-- <div class="additional-links">
+            <a href="#">Forgot your password?</a> | <a href="#">Create an account</a>
+        </div>
+    </div> -->
+
+    <script src="/js/auth/login.js"></script>
+</body>
+</html>
